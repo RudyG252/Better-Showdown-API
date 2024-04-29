@@ -1,0 +1,13 @@
+{
+  "name": "better-showdown-api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "~4.16.1",
+    "nodemon": "^3.1.0"
+  }
+}
