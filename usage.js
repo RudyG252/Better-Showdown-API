@@ -3,7 +3,6 @@ let formatIDs
 let totalTeams;
 
 export async function getUsage(format, pokemon) {
-    console.log(format)
     formatIDs = await configureFormatIDs(format);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
@@ -43,7 +42,6 @@ function checkUsage(pokemon) {
     let monCount = 0;
     let totalCount = 0;
     pokemon = pokemon[0].toUpperCase() + pokemon.substring(1, pokemon.length).toLowerCase();
-    console.log(pokemon);
     for (let i = 0; i < totalTeams.length; i++) {
         for (let j = 0; j < totalTeams[i].length; j++) {
             if (totalTeams[i][j].includes(pokemon)
@@ -56,5 +54,5 @@ function checkUsage(pokemon) {
         }
         totalCount++;
     }
-    return  monCount/totalCount
+    return  ((monCount/totalCount) * 100).toFixed(2);
 }
