@@ -1,3 +1,5 @@
+import { getIDSFromPage } from "./userInfo.js";
+
 let logArr;
 let formatIDs
 let totalTeams;
@@ -12,9 +14,20 @@ export async function getUsage(format, pokemon) {
 
 
 async function configureFormatIDs(format) {
-    let recentMatches = await fetch("https://replay.pokemonshowdown.com/search.json?format=" + format);
-    recentMatches = await recentMatches.json();
-    return recentMatches.map(item => item.id);
+    let currentPageData = await fetch("https://replay.pokemonshowdown.com/search.json?format=" + format);
+    currentPageData = await currentPageData.json();
+    let ids = [];
+    for (let i = 0; i < 10; i++) {
+        if (currentPageData.length === 0) {
+            break;
+        }
+        let lastTimestamp = currentPageData[currentPageData.length - 1].uploadTime;
+        ids = [...ids, ...getIDSFromPage(currentPageData, format)];
+        currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format + "&before=" + lastTimestamp);
+        currentPageData = await currentPageData.json()
+    }
+    return ids;
+    
 }
 
 async function fetchReplayData(id) {

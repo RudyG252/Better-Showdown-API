@@ -1,7 +1,7 @@
 
 import express from 'express';
 
-import indexRouter from './routes/index.js';
+import indexRouter from './routes/userRouter.js';
 import usageRouter from './routes/usageRouter.js'
 
 var app = express();
@@ -10,7 +10,7 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/index', indexRouter);
+app.use('/user', indexRouter);
 app.use('/', usageRouter);
 
 const PORT = process.env.PORT || 3000;
