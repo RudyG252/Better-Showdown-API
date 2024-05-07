@@ -1,8 +1,17 @@
 import express from 'express'
 var router = express.Router();
-import {getUsage} from '../usage.js'
+import {getUsage, getUsageMap} from '../usage.js'
 
 /* GET users listing. */
+
+router.get('/usageMap/:format', async function(req, res, next) {
+    let usage = await getUsageMap(req.params.format)
+    res.status(200).json({
+        success: true,
+        format: req.params.format,
+        usageMap: usage,
+    });
+})
 router.get('/usage/:pokemon', async function(req, res, next) {
   let usage = await getUsage("gen9OU", req.params.pokemon)
   res.status(200).json({

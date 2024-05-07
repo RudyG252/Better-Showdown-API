@@ -6,12 +6,21 @@ let totalTeams;
 let bothMonNameID = "2938238&38#93$29#3&23928392839832"
 
 export async function getUsage(format, pokemon) {
-    formatIDs = await configureFormatIDs(format);
+    formatIDs = await configureFormatIDs(format, 1);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = checkUsage(pokemon, bothMonNameID);
     return usage;
 }   
+
+export async function getUsageMap(format) {
+    formatIDs = await configureFormatIDs(format, 20);
+    logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
+    totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
+    // console.log(totalTeams[0])
+    let usage = createUsageMap(bothMonNameID);
+    return usage;
+}
 
 export async function getPlayerUsage(ids, pokemon, name) {
     logArr = await Promise.all(ids.map(id => fetchReplayData(id)));
@@ -21,12 +30,14 @@ export async function getPlayerUsage(ids, pokemon, name) {
 }
 
 
-async function configureFormatIDs(format) {
+
+
+async function configureFormatIDs(format, pages) {
     let currentPageData = await fetch("https://replay.pokemonshowdown.com/search.json?format=" + format);
     currentPageData = await currentPageData.json();
     let lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
     let ids = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < pages; i++) {
         if (currentPageData.length === 0) {
             break;
         }
@@ -35,7 +46,6 @@ async function configureFormatIDs(format) {
             currentPageData = await currentPageData.json()
             lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
         }
-        console.log(lastTimestamp)
         ids = [...ids, ...getIDSFromPage(currentPageData, format)];
     }
     return ids;
@@ -70,10 +80,10 @@ function checkUsage(pokemon, name) {
     
     let monCount = 0;
     let totalCount = 0;
-    let playerIndex = !(name == bothMonNameID) ? getPlayerIndex(logArr[0], name) : -1;
+    
     pokemon = pokemon[0].toUpperCase() + pokemon.substring(1, pokemon.length).toLowerCase();
-    console.log(pokemon)
     for (let i = 0; i < totalTeams.length; i++) {
+        let playerIndex = !(name == bothMonNameID) ? getPlayerIndex(logArr[i], name) : -1;
         if (teamIncludesPokemon(totalTeams[i][0], pokemon) && playerIndex <= 0) {
             monCount++;
         }
@@ -86,6 +96,44 @@ function checkUsage(pokemon, name) {
         }
     }
     return  ((monCount/totalCount) * 100).toFixed(2);
+}
+
+function createUsageMap(name) {
+    let usageMap = new Map();
+    let total = 0;
+    for (let i = 0; i < totalTeams.length; i++) {
+        let playerIndex = !(name == bothMonNameID) ? getPlayerIndex(logArr[i], name) : -1;
+        if (playerIndex <= 0) {
+            for (let j = 0; j < totalTeams[i][0].length; j++) {
+                let mon = simplifyMonName(totalTeams[i][0][j])
+                if (!usageMap.has(mon)) {
+                    usageMap.set(mon, 1);
+                }
+                else {
+                    usageMap.set(mon, usageMap.get(mon) + 1)
+                }
+            }
+            total++;
+        }
+        if (playerIndex == -1 || playerIndex > 0) {
+            for (let j = 0; j < totalTeams[i][1].length; j++) {
+                let mon = simplifyMonName(totalTeams[i][1][j])
+                if (!usageMap.has(mon)) {
+                    usageMap.set(mon, 1);
+                }
+                else {
+                    usageMap.set(mon, usageMap.get(mon) + 1)
+                }
+
+            }
+            total++;
+        }
+    }
+    usageMap = new Map([...usageMap.entries()].sort((a, b) => b[1] - a[1]));
+    usageMap.forEach((value, key) => {
+        usageMap.set(key, ((value / total) * 100).toFixed(2));
+      });
+    return Object.fromEntries(usageMap);
 }
 
 function getPlayerIndex(log, name) {
@@ -104,6 +152,15 @@ function teamIncludesPokemon(team, pokemon) {
     return (team.includes(pokemon)
         || team.includes(pokemon + ", M")
         || team.includes(pokemon + ", F"))
+}
+
+function simplifyMonName(pokemon) {
+    for (let i = 0; i < pokemon.length; i++) {
+        if (pokemon[i] == ',') {
+            return pokemon.substring(0, i);
+        }
+    }
+    return pokemon
 }
 
     
