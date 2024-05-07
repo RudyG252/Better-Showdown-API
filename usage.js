@@ -14,7 +14,7 @@ export async function getUsage(format, pokemon) {
 }   
 
 export async function getUsageMap(format) {
-    formatIDs = await configureFormatIDs(format, 20);
+    formatIDs = await configureFormatIDs(format, 3);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     // console.log(totalTeams[0])
@@ -27,6 +27,13 @@ export async function getPlayerUsage(ids, pokemon, name) {
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = checkUsage(pokemon, name);
     return usage
+}
+
+export async function getPlayerUsageMap(ids, name) {
+    logArr = await Promise.all(ids.map(id => fetchReplayData(id)));
+    totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
+    let usage = createUsageMap(name);
+    return usage;
 }
 
 
@@ -103,9 +110,11 @@ function createUsageMap(name) {
     let total = 0;
     for (let i = 0; i < totalTeams.length; i++) {
         let playerIndex = !(name == bothMonNameID) ? getPlayerIndex(logArr[i], name) : -1;
+        console.log(playerIndex)
         if (playerIndex <= 0) {
             for (let j = 0; j < totalTeams[i][0].length; j++) {
                 let mon = simplifyMonName(totalTeams[i][0][j])
+                console.log(mon)
                 if (!usageMap.has(mon)) {
                     usageMap.set(mon, 1);
                 }
@@ -128,21 +137,24 @@ function createUsageMap(name) {
             }
             total++;
         }
+        // console.log(usageMap)
     }
     usageMap = new Map([...usageMap.entries()].sort((a, b) => b[1] - a[1]));
     usageMap.forEach((value, key) => {
         usageMap.set(key, ((value / total) * 100).toFixed(2));
       });
+    console.log(Object.fromEntries(usageMap));
     return Object.fromEntries(usageMap);
 }
 
 function getPlayerIndex(log, name) {
     let lines = log.split("\n");
     for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith("|player|p1|" + name)) {
+        lines[i] = lines[i].toLowerCase();
+        if (lines[i].startsWith("|player|p1|" + name.toLowerCase())) {
             return 0;
         }
-        if (lines[i].startsWith("|player|p2|" + name)) {
+        if (lines[i].startsWith("|player|p2|" + name.toLowerCase())) {
             return 1;
         }
     }

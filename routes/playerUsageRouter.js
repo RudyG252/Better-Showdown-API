@@ -1,6 +1,6 @@
 import express from 'express'
 var router = express.Router();
-import {getPlayerUsage} from '../usage.js'
+import {getPlayerUsage, getPlayerUsageMap} from '../usage.js'
 import {getUserInfo} from '../userInfo.js'
 
 router.get('/:name/:format/:pokemon', async function(req, res, next) {
@@ -15,11 +15,21 @@ router.get('/:name/:format/:pokemon', async function(req, res, next) {
 
 router.get('/:name/:pokemon', async function(req, res, next) {
     let userInfo = await getUserInfo(req.params.name, 'Gen9OU', 1);
-    let playerUsage = await getPlayerUsage(userInfo, req.params.pokemon);
+    let playerUsage = await getPlayerUsage(userInfo, req.params.pokemon, req.params.name);
     res.status(200).json({
         success: true,
         user: req.params.name,
         usagePercentage: playerUsage
+    });
+})
+
+router.get('/:name', async function(req, res, next) {
+    let userInfo = await getUserInfo(req.params.name, 'Gen9OU', 5);
+    let playerUsage = await getPlayerUsageMap(userInfo, req.params.name);
+    res.status(200).json({
+        success: true,
+        user: req.params.name,
+        usageMap: playerUsage
     });
 })
 
