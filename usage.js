@@ -1,4 +1,14 @@
 import { getIDSFromPage } from "./userInfo.js";
+import  {
+    addDoc,
+    collection,
+    getDocs,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot
+} from "firebase/firestore";
+import {db} from "./firebase.js";
 
 let logArr;
 let formatIDs
@@ -36,6 +46,11 @@ export async function getPlayerUsageMap(ids, name) {
     return usage;
 }
 
+
+export async function testFunction(pokemonName) {
+    await addDoc(collection(db, "Pokemon"), {text : pokemonName})
+    return "yay?"
+}
 
 
 
