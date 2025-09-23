@@ -1,4 +1,4 @@
-import { getIDSFromPage } from "./userInfo.js";
+import { getIDSFromPage, getIDSFromPageRestricted } from "./userInfo.js";
 import  {
     addDoc,
     collection,
@@ -6,7 +6,9 @@ import  {
     deleteDoc,
     doc,
     updateDoc,
-    onSnapshot
+    onSnapshot,
+    setDoc,
+    getDoc
 } from "firebase/firestore";
 import {db} from "./firebase.js";
 
@@ -16,9 +18,11 @@ let totalTeams;
 let bothMonNameID = "2938238&38#93$29#3&23928392839832"
 
 export async function getUsage(format, pokemon) {
-    formatIDs = await configureFormatIDs(format, 1);
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
+    // formatIDs = await configureFormatIDs(format, 3);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
+    // console.log(totalTeams);
     let usage = checkUsage(pokemon, bothMonNameID);
     return usage;
 }   
@@ -30,6 +34,10 @@ export async function getUsageMap(format) {
     // console.log(totalTeams[0])
     let usage = createUsageMap(bothMonNameID);
     return usage;
+}
+
+export async function updateDB(format) {
+    formatIDs = await configureFormatIDsRestricted(format, month, maxPages)
 }
 
 export async function getPlayerUsage(ids, pokemon, name) {
@@ -48,8 +56,13 @@ export async function getPlayerUsageMap(ids, name) {
 
 
 export async function testFunction(pokemonName) {
-    await addDoc(collection(db, "Pokemon"), {text : pokemonName})
-    return "yay?"
+
+
+    let pokeRef = doc(db, "Months", "09_25", "PokeData", "Formats", "Gen9OU",  pokemonName);
+    let prevData = (await getDoc(pokeRef)).data();
+    await setDoc(pokeRef, {"Losses" : 100, "Uses" : prevData["Uses"] + 1, "Wins" : 100});
+    let returnVal = await getDoc(pokeRef)
+    return returnVal.data();
 }
 
 
@@ -69,10 +82,72 @@ async function configureFormatIDs(format, pages) {
             lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
         }
         ids = [...ids, ...getIDSFromPage(currentPageData, format)];
+        console.log(ids);
     }
     return ids;
     
 }
+
+
+async function configureFormatIDsRestricted(format, month, maxPages) {
+    // Month Format = 09_25
+    let date = new Date('20' + month.substring(3,5) + '-' + month.substring(0, 2) + '-' + '01T12:30:00Z')
+    let epochDate = +date;
+    epochDate = epochDate / 1000;
+    let timestamps = (await getDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"))).data();
+    let recentStamp = 1000000000000000000;
+    let oldStamp = epochDate
+    let ids = [];
+    if (timestamps == undefined) {
+        setDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"), {"Recent" : epochDate, "Oldest" : 10000000000000000000000})
+
+    }
+    else {
+        recentStamp = timestamps["Recent"]
+        oldStamp = timestamps["Oldest"]
+    }
+    let currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format);
+    currentPageData = await currentPageData.json();
+    let lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
+    let newRecentStamp = currentPageData[0].uploadtime;
+    for (let i = 0; i < maxPages; i++) {
+        if (currentPageData.length === 0) {
+            break;
+        }
+        if (i > 0) {
+            currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format + "&before=" + lastTimestamp);
+            currentPageData = await currentPageData.json()
+            lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
+            if (lastTimestamp < oldStamp) {
+                oldStamp = lastTimestamp
+            }
+        }
+        ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, recentStamp)];
+        console.log(ids);
+        if (lastTimestamp <= recentStamp){
+            break;
+        }
+    }
+    lastTimestamp = oldStamp;
+    for (let i = 0; i < maxPages; i++) {
+        if (currentPageData.length === 0) {
+            break;
+        }
+        currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format + "&before=" + lastTimestamp);
+        currentPageData = await currentPageData.json()
+        lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
+        if (lastTimestamp < oldStamp) {
+            oldStamp = lastTimestamp
+        }
+        ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, epochDate)];
+        if (lastTimestamp <= epochDate){
+            break;
+        }
+    }
+    updateDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"), {"Recent" : newRecentStamp, "Oldest" : oldStamp});
+    return ids;
+}
+
 
 async function fetchReplayData(id) {
     const response = await fetch("https://replay.pokemonshowdown.com/" + id + ".json");
@@ -188,6 +263,16 @@ function simplifyMonName(pokemon) {
         }
     }
     return pokemon
+}
+
+function getMonth(epochDate) {
+    let dateObject = new Date(epochDate * 1000);
+    let month = dateObject.getMonth() + 1;
+    if (month < 10) {
+        month = '0' + month;
+    }
+    let year = dateObject.getFullYear();
+    return month + "_" + (year - 2000);
 }
 
     

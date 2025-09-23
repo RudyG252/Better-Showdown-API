@@ -35,6 +35,20 @@ export function getIDSFromPage(page, format) {
     return ids;
 }
 
+export function getIDSFromPageRestricted(page, format, cancelStamp) {
+    let ids = [];
+    for (let i = 0; i < page.length; i++) {
+        let timestamp = page[page.length - 1].uploadtime;
+        if ((timestamp <= cancelStamp)) {
+            break;
+        }
+        if (getFormatOutOfID(page[i].id) === format.toLowerCase() || format === "all") {
+            ids.push(page[i].id);
+        }
+    }
+    return ids;
+}
+
 function getFormatOutOfID(id) {
     for (let i = 0; i < id.length; i++) {
         if (id[i] == '-') {

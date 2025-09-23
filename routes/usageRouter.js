@@ -13,7 +13,7 @@ router.get('/usageMap/:format', async function(req, res, next) {
     });
 })
 router.get('/usage/:pokemon', async function(req, res, next) {
-  let usage = await getUsage("gen9OU", req.params.pokemon)
+  let usage = await getUsage("Gen9OU", req.params.pokemon)
   res.status(200).json({
       success: true,
       pokemon: req.params.pokemon,
@@ -37,7 +37,7 @@ router.get('/:pokemon', async function(req, res) {
     let test = await testFunction(req.params.pokemon)
     res.status(200).json({
         success: true,
-        pokemon: req.params.pokemon
+        test
     });
   });
 
