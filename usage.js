@@ -130,7 +130,7 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
             }
         }
         console.log(ids)
-        ids = [...ids, ...getIDSFromPage(currentPageData, format)];
+        ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, recentStamp)];
         // console.log(ids);
         if (lastTimestamp <= recentStamp){
             break;
