@@ -20,12 +20,31 @@ var globalLastTimestamp = 0;
 var globalRecentTimestamp = 0;
 
 export async function getUsage(format, pokemon) {
-    formatIDs = await configureFormatIDsRestricted(format, '09_25', 5);
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = checkUsage(pokemon, bothMonNameID);
     return usage;
 }   
+
+
+export async function getUsageFirebase(format, pokemon) {
+    let total = 0;
+    const allMons = await getDocs(collection(db, 'Months', '09_25', 'PokeData', 'Formats', format));
+    allMons.forEach((doc) => {
+        if (doc.data()['Uses'] != undefined) {
+            total += (doc.data())['Uses']
+            console.log(total)
+        }
+    })
+    let monData = (await getDoc(doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, pokemon))).data()
+    if (monData == undefined) {
+        return (0).toFixed(2)
+    }
+    let monUsage = monData['Uses']
+    console.log(monUsage);
+    return ((monUsage/total) * 100).toFixed(2);
+}
 
 export async function getUsageMap(format) {
     formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
@@ -36,15 +55,11 @@ export async function getUsageMap(format) {
 }
 
 
-export async function updateDB(format) {
-    formatIDs = await configureFormatIDsRestricted(format, '09_25', 30);
-    console.log("FinishFormatIDs")
+export async function updateDB(format, pages) {
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', pages);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
-    console.log("finish fetching replay data")
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
-    console.log("finish total teams")
     let totalTeamData = getTotalTeamData(format);
-    console.log("finish totalTeamData");
     for (const property in totalTeamData) {
         let pokeRef = doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, property);
         let docData = (await getDoc(pokeRef)).data()
