@@ -1,6 +1,6 @@
 import express from 'express'
 var router = express.Router();
-import {getUsage, getUsageMap, testFunction} from '../usage.js'
+import {getUsage, getUsageMap, updateDB} from '../usage.js'
 
 
 /* GET users listing. */
@@ -33,8 +33,8 @@ router.get('/usage/:format/:pokemon', async function(req, res, next) {
 });
 
 
-router.get('/:pokemon', async function(req, res) {
-    let test = await testFunction(req.params.pokemon)
+router.get('/:format', async function(req, res) {
+    let test = await updateDB(req.params.format)
     res.status(200).json({
         success: true,
         test

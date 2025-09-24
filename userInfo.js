@@ -39,8 +39,6 @@ export function getIDSFromPageRestricted(page, format, cancelStamp) {
     let ids = [];
     for (let i = 0; i < page.length; i++) {
         let timestamp = page[page.length - 1].uploadtime;
-        console.log(timestamp);
-        console.log(cancelStamp);
         if ((timestamp <= cancelStamp)) {
             break;
         }

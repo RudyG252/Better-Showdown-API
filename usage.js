@@ -28,16 +28,38 @@ export async function getUsage(format, pokemon) {
 }   
 
 export async function getUsageMap(format) {
-    formatIDs = await configureFormatIDs(format, 3);
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = createUsageMap(bothMonNameID);
     return usage;
 }
 
+
 export async function updateDB(format) {
-    formatIDs = await configureFormatIDsRestricted(format, month, maxPages)
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 30);
+    console.log("FinishFormatIDs")
+    logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
+    console.log("finish fetching replay data")
+    totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
+    console.log("finish total teams")
+    let totalTeamData = getTotalTeamData(format);
+    console.log("finish totalTeamData");
+    for (const property in totalTeamData) {
+        let pokeRef = doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, property);
+        let docData = (await getDoc(pokeRef)).data()
+        if (docData == undefined) {
+            await setDoc(doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, property), {'Uses' : totalTeamData[property]})
+        }
+        else {
+            let prevUses = docData['Uses']
+            await updateDoc(pokeRef, {'Uses' : (prevUses + totalTeamData[property])})
+        }
+    }
+    return "";
 }
+
+
 
 export async function getPlayerUsage(ids, pokemon, name) {
     logArr = await Promise.all(ids.map(id => fetchReplayData(id)));
@@ -59,7 +81,7 @@ export async function testFunction(pokemonName) {
 
     let pokeRef = doc(db, "Months", "09_25", "PokeData", "Formats", "Gen9OU",  pokemonName);
     let prevData = (await getDoc(pokeRef)).data();
-    await setDoc(pokeRef, {"Losses" : 100, "Uses" : prevData["Uses"] + 1, "Wins" : 100});
+    await setDoc(pokeRef, {"Losses" : 100, "Uses" : 100, "Wins" : 100});
     let returnVal = await getDoc(pokeRef)
     return returnVal.data();
 }
@@ -84,7 +106,6 @@ async function configureFormatIDs(format, pages) {
             globalLastTimestamp = lastTimestamp
         }
         ids = [...ids, ...getIDSFromPage(currentPageData, format)];
-        console.log(ids);
     }
     // console.log(globalLastTimestamp);
     // console.log(globalRecentTimestamp);
@@ -94,6 +115,7 @@ async function configureFormatIDs(format, pages) {
 
 
 async function configureFormatIDsRestricted(format, month, maxPages) {
+    
     // Month Format = 09_25
     let date = new Date('20' + month.substring(3,5) + '-' + month.substring(0, 2) + '-' + '01T12:30:00Z')
     let epochDate = +date;
@@ -104,8 +126,6 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
     let ids = [];
     if (timestamps == undefined) {
         let firstIDs = await configureFormatIDs(format, maxPages)
-        console.log(globalLastTimestamp)
-        console.log(globalRecentTimestamp);
         await setDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"), {"Recent" : globalRecentTimestamp, "Oldest" : globalLastTimestamp})
         return firstIDs;
     }
@@ -129,7 +149,6 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
                 oldStamp = lastTimestamp
             }
         }
-        console.log(ids)
         ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, recentStamp)];
         // console.log(ids);
         if (lastTimestamp <= recentStamp){
@@ -153,7 +172,6 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
         }
     }
     updateDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"), {"Recent" : newRecentStamp, "Oldest" : oldStamp});
-    console.log(ids)
     return ids;
 }
 
@@ -207,13 +225,15 @@ function checkUsage(pokemon, name) {
 function createUsageMap(name) {
     let usageMap = new Map();
     let total = 0;
+    // console.log(totalTeams[2])
     for (let i = 0; i < totalTeams.length; i++) {
         let playerIndex = !(name == bothMonNameID) ? getPlayerIndex(logArr[i], name) : -1;
-        console.log(playerIndex)
         if (playerIndex <= 0) {
             for (let j = 0; j < totalTeams[i][0].length; j++) {
+                if (mon == undefined) {
+                    console.log(totalTeams[i]);
+                }
                 let mon = simplifyMonName(totalTeams[i][0][j])
-                console.log(mon)
                 if (!usageMap.has(mon)) {
                     usageMap.set(mon, 1);
                 }
@@ -242,8 +262,31 @@ function createUsageMap(name) {
     usageMap.forEach((value, key) => {
         usageMap.set(key, ((value / total) * 100).toFixed(2));
       });
-    console.log(Object.fromEntries(usageMap));
+    // console.log(Object.fromEntries(usageMap));
     return Object.fromEntries(usageMap);
+}
+
+
+function getTotalTeamData(format) {
+    let totalTeamData = new Map();
+    for (let i = 0; i < totalTeams.length; i++) {
+        for (let j = 0; j < 2; j++) {
+            for (let k = 0; k < totalTeams[j].length; k++) {
+                if (totalTeams[i][j][k] == undefined) {
+                    break;
+                }
+                let mon = simplifyMonName(totalTeams[i][j][k])
+                if (!totalTeamData.has(mon)) {
+                    totalTeamData.set(mon, 1);
+                }
+                else {
+                    totalTeamData.set(mon, totalTeamData.get(mon) + 1);
+                }
+            }
+        }
+    }
+    // console.log(Object.fromEntries(totalTeamData));
+    return (Object.fromEntries(totalTeamData));
 }
 
 function getPlayerIndex(log, name) {
