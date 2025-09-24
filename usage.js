@@ -20,7 +20,7 @@ var globalLastTimestamp = 0;
 var globalRecentTimestamp = 0;
 
 export async function getUsage(format, pokemon) {
-    formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 100);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = checkUsage(pokemon, bothMonNameID);
@@ -28,16 +28,16 @@ export async function getUsage(format, pokemon) {
 }   
 
 
-export async function getUsageFirebase(format, pokemon) {
+export async function getUsageFirebase(format, pokemon, month) {
     let total = 0;
-    const allMons = await getDocs(collection(db, 'Months', '09_25', 'PokeData', 'Formats', format));
+    const allMons = await getDocs(collection(db, 'Months', month, 'PokeData', 'Formats', format));
     allMons.forEach((doc) => {
         if (doc.data()['Uses'] != undefined) {
             total += (doc.data())['Uses']
             console.log(total)
         }
     })
-    let monData = (await getDoc(doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, pokemon))).data()
+    let monData = (await getDoc(doc(db, 'Months', month, 'PokeData', 'Formats', format, pokemon))).data()
     if (monData == undefined) {
         return (0).toFixed(2)
     }
@@ -55,22 +55,28 @@ export async function getUsageMap(format) {
 }
 
 
-export async function updateDB(format, pages) {
-    formatIDs = await configureFormatIDsRestricted(format, '09_25', pages);
+export async function updateDB(month, format, pages) {
+    console.log("Start Format IDs")
+    formatIDs = await configureFormatIDsRestricted(format, month, pages);
+    console.log("Start logArr")
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
+    console.log("Start totalTeams")
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
+    console.log("Start totalTeamData")
     let totalTeamData = getTotalTeamData(format);
+    console.log("Start Firebase Uploads")
     for (const property in totalTeamData) {
-        let pokeRef = doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, property);
+        let pokeRef = doc(db, 'Months', month, 'PokeData', 'Formats', format, property);
         let docData = (await getDoc(pokeRef)).data()
         if (docData == undefined) {
-            await setDoc(doc(db, 'Months', '09_25', 'PokeData', 'Formats', format, property), {'Uses' : totalTeamData[property]})
+            await setDoc(doc(db, 'Months', month, 'PokeData', 'Formats', format, property), {'Uses' : totalTeamData[property]})
         }
         else {
             let prevUses = docData['Uses']
             await updateDoc(pokeRef, {'Uses' : (prevUses + totalTeamData[property])})
         }
     }
+    console.log("Finish Firebase Uploads")
     return "";
 }
 
@@ -103,8 +109,11 @@ export async function testFunction(pokemonName) {
 
 
 
-async function configureFormatIDs(format, pages) {
-    let currentPageData = await fetch("https://replay.pokemonshowdown.com/search.json?format=" + format);
+async function configureFormatIDs(format, pages, startingStamp) {
+    if (startingStamp == -1) {
+        startingStamp = Date.now();
+    }
+    let currentPageData = await fetch("https://replay.pokemonshowdown.com/search.json?format=" + format + "&before=" + startingStamp);
     currentPageData = await currentPageData.json();
     let lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
     globalLastTimestamp = lastTimestamp;
@@ -132,15 +141,27 @@ async function configureFormatIDs(format, pages) {
 async function configureFormatIDsRestricted(format, month, maxPages) {
     
     // Month Format = 09_25
-    let date = new Date('20' + month.substring(3,5) + '-' + month.substring(0, 2) + '-' + '01T12:30:00Z')
-    let epochDate = +date;
-    epochDate = epochDate / 1000;
+    let monthStart = new Date('20' + month.substring(3,5) + '-' + month.substring(0, 2) + '-' + '01T12:30:00Z')
+    let epochMonthStart = +monthStart;
+    epochMonthStart = epochMonthStart / 1000;
     let timestamps = (await getDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"))).data();
     let recentStamp = 0;
-    let oldStamp = epochDate
+    let oldStamp = epochMonthStart
     let ids = [];
+    let startingStamp = 0;
+    if (getMonth(Date.now()) == month) {
+        console.log("This Month")
+        startingStamp = Date.now();
+    }
+    else {
+        let monthEnd = new Date('20' + month.substring(3,5) + '-' + month.substring(0,2) + '-' + '30T23:59:00Z');
+        console.log(monthEnd);
+        startingStamp = +monthEnd
+        startingStamp = monthEnd / 1000;
+    }
+
     if (timestamps == undefined) {
-        let firstIDs = await configureFormatIDs(format, maxPages)
+        let firstIDs = await configureFormatIDs(format, maxPages, startingStamp)
         await setDoc(doc(db, "Months", month, "PokeData", "Formats", format, "Timestamps"), {"Recent" : globalRecentTimestamp, "Oldest" : globalLastTimestamp})
         return firstIDs;
     }
@@ -148,7 +169,7 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
         recentStamp = timestamps["Recent"]
         oldStamp = timestamps["Oldest"]
     }
-    let currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format);
+    let currentPageData = await fetch ("https://replay.pokemonshowdown.com/search.json?format=" + format + "&before=" + startingStamp);
     currentPageData = await currentPageData.json();
     let lastTimestamp = currentPageData[currentPageData.length - 1].uploadtime;
     let newRecentStamp = currentPageData[0].uploadtime;
@@ -167,6 +188,8 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
         ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, recentStamp)];
         // console.log(ids);
         if (lastTimestamp <= recentStamp){
+            console.log("cancel in first main method")
+            console.log("Stamps: " + lastTimestamp + " and " + recentStamp)
             break;
         }
     }
@@ -181,8 +204,10 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
         if (lastTimestamp < oldStamp) {
             oldStamp = lastTimestamp
         }
-        ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, epochDate)];
-        if (lastTimestamp <= epochDate){
+        ids = [...ids, ...getIDSFromPageRestricted(currentPageData, format, epochMonthStart)];
+        if (lastTimestamp <= epochMonthStart){
+            console.log("cancel in second main method")
+            console.log("Stamps: " + lastTimestamp + " and " + epochMonthStart)
             break;
         }
     }

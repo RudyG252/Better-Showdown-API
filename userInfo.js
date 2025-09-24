@@ -40,6 +40,8 @@ export function getIDSFromPageRestricted(page, format, cancelStamp) {
     for (let i = 0; i < page.length; i++) {
         let timestamp = page[page.length - 1].uploadtime;
         if ((timestamp <= cancelStamp)) {
+            console.log("cancel in submethod")
+            console.log("Stamps: " + timestamp + " and " + cancelStamp)
             break;
         }
         if (getFormatOutOfID(page[i].id) === format.toLowerCase() || format === "all") {
