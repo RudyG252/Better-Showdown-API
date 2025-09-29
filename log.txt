@@ -1,0 +1,331 @@
+|j|‽Kiyoshii_0
+|j|☆rudyrage1
+|t:|1758829348
+|gametype|singles
+|player|p1|Kiyoshii_0|benga|1147
+|player|p2|rudyrage1|169|1131
+|gen|9
+|tier|[Gen 9] Ubers
+|rated|
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|clearpoke
+|poke|p1|Kyogre|
+|poke|p1|Dragonite, M|
+|poke|p1|Polteageist|
+|poke|p1|Ursaluna, M|
+|poke|p1|Metagross|
+|poke|p1|Shaymin-Sky|
+|poke|p2|Ursaluna-Bloodmoon, M|
+|poke|p2|Shaymin-Sky|
+|poke|p2|Koraidon|
+|poke|p2|Ho-Oh|
+|poke|p2|Raging Bolt|
+|poke|p2|Palafin, M|
+|teampreview
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by Kiyoshii_0)
+|
+|t:|1758829360
+|teamsize|p1|6
+|teamsize|p2|6
+|start
+|switch|p1a: Polteageist|Polteageist, shiny|100/100
+|switch|p2a: PalieWalie|Palafin, M|100/100
+|turn|1
+|
+|t:|1758829377
+|move|p2a: PalieWalie|Jet Punch|p1a: Polteageist
+|-damage|p1a: Polteageist|51/100
+|-ability|p1a: Polteageist|Weak Armor|boost
+|-unboost|p1a: Polteageist|def|1
+|-boost|p1a: Polteageist|spe|2
+|-enditem|p1a: Polteageist|White Herb
+|-clearnegativeboost|p1a: Polteageist|[silent]
+|move|p1a: Polteageist|Shell Smash|p1a: Polteageist
+|-unboost|p1a: Polteageist|def|1
+|-unboost|p1a: Polteageist|spd|1
+|-boost|p1a: Polteageist|atk|2
+|-boost|p1a: Polteageist|spa|2
+|-boost|p1a: Polteageist|spe|2
+|
+|upkeep
+|turn|2
+|
+|t:|1758829401
+|move|p2a: PalieWalie|Jet Punch|p1a: Polteageist
+|-damage|p1a: Polteageist|0 fnt
+|faint|p1a: Polteageist
+|
+|upkeep
+|
+|t:|1758829407
+|switch|p1a: Shaymin|Shaymin-Sky, shiny|100/100
+|turn|3
+|
+|t:|1758829422
+|detailschange|p2a: PalieWalie|Palafin-Hero, M
+|switch|p2a: ShaymyWamy|Shaymin-Sky|100/100
+|move|p1a: Shaymin|Substitute|p1a: Shaymin
+|-start|p1a: Shaymin|Substitute
+|-damage|p1a: Shaymin|76/100
+|
+|-heal|p1a: Shaymin|82/100|[from] item: Leftovers
+|upkeep
+|turn|4
+|
+|t:|1758829432
+|move|p2a: ShaymyWamy|Air Slash|p1a: Shaymin
+|-supereffective|p1a: Shaymin
+|-crit|p1a: Shaymin
+|-end|p1a: Shaymin|Substitute
+|move|p1a: Shaymin|Air Slash|p2a: ShaymyWamy
+|-supereffective|p2a: ShaymyWamy
+|-damage|p2a: ShaymyWamy|7/100
+|
+|-heal|p1a: Shaymin|88/100|[from] item: Leftovers
+|upkeep
+|turn|5
+|
+|t:|1758829446
+|switch|p1a: Metagross|Metagross, shiny|100/100
+|move|p2a: ShaymyWamy|Air Slash|p1a: Metagross
+|-resisted|p1a: Metagross
+|-damage|p1a: Metagross|83/100
+|
+|upkeep
+|turn|6
+|
+|t:|1758829453
+|move|p1a: Metagross|Bullet Punch|p2a: ShaymyWamy
+|-damage|p2a: ShaymyWamy|0 fnt
+|faint|p2a: ShaymyWamy
+||
+|upkeep
+|
+|t:|1758829465
+|switch|p2a: UrsyWursy|Ursaluna-Bloodmoon, M|100/100
+|turn|7
+|
+|t:|1758829477
+|switch|p1a: Shaymin|Shaymin-Sky, shiny|88/100
+|move|p2a: UrsyWursy|Calm Mind|p2a: UrsyWursy
+|-boost|p2a: UrsyWursy|spa|1
+|-boost|p2a: UrsyWursy|spd|1
+|
+|-heal|p1a: Shaymin|94/100|[from] item: Leftovers
+|upkeep
+|turn|8
+|
+|t:|1758829488
+|move|p1a: Shaymin|Air Slash|p2a: UrsyWursy
+|-damage|p2a: UrsyWursy|71/100
+|cant|p2a: UrsyWursy|flinch
+|
+|-heal|p1a: Shaymin|99/100|[from] item: Leftovers
+|-heal|p2a: UrsyWursy|77/100|[from] item: Leftovers
+|upkeep
+|turn|9
+|
+|t:|1758829498
+|move|p1a: Shaymin|Seed Flare|p2a: UrsyWursy
+|-supereffective|p2a: UrsyWursy
+|-damage|p2a: UrsyWursy|0 fnt
+|faint|p2a: UrsyWursy
+|
+|-heal|p1a: Shaymin|100/100|[from] item: Leftovers
+|upkeep
+|
+|t:|1758829508
+|switch|p2a: KoraiWorai|Koraidon|100/100
+|-weather|SunnyDay|[from] ability: Orichalcum Pulse|[of] p2a: KoraiWorai
+|-activate|p2a: KoraiWorai|Orichalcum Pulse|[source]
+|turn|10
+|
+|t:|1758829526
+|move|p2a: KoraiWorai|Outrage|p1a: Shaymin
+|-damage|p1a: Shaymin|0 fnt
+|faint|p1a: Shaymin
+|
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|
+|t:|1758829534
+|switch|p1a: Metagross|Metagross, shiny|83/100
+|turn|11
+|
+|t:|1758829545
+|move|p2a: KoraiWorai|Outrage|p1a: Metagross|[from] lockedmove
+|-resisted|p1a: Metagross
+|-damage|p1a: Metagross|35/100
+|-start|p2a: KoraiWorai|confusion|[fatigue]
+|move|p1a: Metagross|Agility|p1a: Metagross
+|-boost|p1a: Metagross|spe|2
+|
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|turn|12
+|
+|t:|1758829558
+|-activate|p2a: KoraiWorai|confusion
+|move|p2a: KoraiWorai|Outrage|p1a: Metagross
+|-resisted|p1a: Metagross
+|-damage|p1a: Metagross|0 fnt
+|faint|p1a: Metagross
+|
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|
+|t:|1758829566
+|switch|p1a: Ursaluna|Ursaluna, M, shiny|100/100
+|turn|13
+|
+|t:|1758829577
+|move|p1a: Ursaluna|Protect|p1a: Ursaluna
+|-singleturn|p1a: Ursaluna|Protect
+|-activate|p2a: KoraiWorai|confusion
+|move|p2a: KoraiWorai|Outrage|p1a: Ursaluna|[from] lockedmove
+|-activate|p1a: Ursaluna|move: Protect
+|
+|-weather|SunnyDay|[upkeep]
+|-status|p1a: Ursaluna|brn|[from] item: Flame Orb
+|upkeep
+|turn|14
+|
+|t:|1758829592
+|-activate|p2a: KoraiWorai|confusion
+|-damage|p2a: KoraiWorai|87/100|[from] confusion
+|move|p1a: Ursaluna|Facade|p2a: KoraiWorai
+|-damage|p2a: KoraiWorai|0 fnt
+|faint|p2a: KoraiWorai
+|
+|-weather|none
+|-damage|p1a: Ursaluna|94/100 brn|[from] brn
+|upkeep
+|
+|t:|1758829600
+|switch|p2a: PalieWalie|Palafin-Hero, M|100/100
+|-activate|p2a: PalieWalie|ability: Zero to Hero
+|turn|15
+|
+|t:|1758829617
+|-terastallize|p1a: Ursaluna|Ghost
+|move|p2a: PalieWalie|Ice Punch|p1a: Ursaluna
+|-damage|p1a: Ursaluna|64/100 brn
+|move|p1a: Ursaluna|Facade|p2a: PalieWalie
+|-damage|p2a: PalieWalie|0 fnt
+|faint|p2a: PalieWalie
+|
+|-damage|p1a: Ursaluna|58/100 brn|[from] brn
+|upkeep
+|
+|t:|1758829626
+|switch|p2a: HoeiOei|Ho-Oh|100/100
+|turn|16
+|
+|t:|1758829635
+|move|p2a: HoeiOei|Re  flect|p2a: HoeiOei
+|-sidestart|p2: rudyrage1|Reflect
+|move|p1a: Ursaluna|Facade|p2a: HoeiOei
+|-damage|p2a: HoeiOei|52/100
+|
+|-damage|p1a: Ursaluna|52/100 brn|[from] brn
+|upkeep
+|turn|17
+|
+|t:|1758829646
+|move|p2a: HoeiOei|Sacred Fire|p1a: Ursaluna|[miss]
+|-miss|p2a: HoeiOei|p1a: Ursaluna
+|move|p1a: Ursaluna|Facade|p2a: HoeiOei
+|-damage|p2a: HoeiOei|0 fnt
+|faint|p2a: HoeiOei
+|
+|-damage|p1a: Ursaluna|46/100 brn|[from] brn
+|upkeep
+|
+|t:|1758829654
+|switch|p2a: RageWagei|Raging Bolt|100/100
+|turn|18
+|
+|t:|1758829661
+|move|p2a: RageWagei|Dragon Pulse|p1a: Ursaluna
+|-damage|p1a: Ursaluna|0 fnt
+|faint|p1a: Ursaluna
+|
+|upkeep
+|
+|t:|1758829673
+|switch|p1a: Kyogre|Kyogre|100/100
+|-weather|RainDance|[from] ability: Drizzle|[of] p1a: Kyogre
+|turn|19
+|
+|t:|1758829692
+|-terastallize|p2a: RageWagei|Electric
+|move|p2a: RageWagei|Thunderclap|p1a: Kyogre
+|-supereffective|p1a: Kyogre
+|-damage|p1a: Kyogre|23/100
+|move|p1a: Kyogre|Water Spout|p2a: RageWagei
+|-damage|p2a: RageWagei|71/100
+|
+|-weather|RainDance|[upkeep]
+|-heal|p2a: RageWagei|78/100|[from] item: Leftovers
+|upkeep
+|turn|20
+|
+|t:|1758829716
+|move|p1a: Kyogre|Water Spout|p2a: RageWagei
+|-damage|p2a: RageWagei|49/100
+|move|p2a: RageWagei|Thunderbolt|p1a: Kyogre
+|-supereffective|p1a: Kyogre
+|-damage|p1a: Kyogre|0 fnt
+|faint|p1a: Kyogre
+|
+|-weather|RainDance|[upkeep]
+|-heal|p2a: RageWagei|55/100|[from] item: Leftovers
+|upkeep
+|
+|t:|1758829729
+|switch|p1a: Dragonite|Dragonite, M|100/100
+|turn|21
+|
+|t:|1758829746
+|move|p1a: Dragonite|Dragon Dance|p1a: Dragonite
+|-boost|p1a: Dragonite|atk|1
+|-boost|p1a: Dragonite|spe|1
+|move|p2a: RageWagei|Dragon Pulse|p1a: Dragonite
+|-supereffective|p1a: Dragonite
+|-damage|p1a: Dragonite|53/100
+|
+|-weather|RainDance|[upkeep]
+|-heal|p2a: RageWagei|61/100|[from] item: Leftovers
+|upkeep
+|turn|22
+|
+|t:|1758829757
+|move|p2a: RageWagei|Thunderclap|p1a: Dragonite
+|-damage|p1a: Dragonite|3/100
+|move|p1a: Dragonite|Earthquake|p2a: RageWagei
+|-supereffective|p2a: RageWagei
+|-damage|p2a: RageWagei|15/100
+|
+|-weather|RainDance|[upkeep]
+|-heal|p2a: RageWagei|21/100|[from] item: Leftovers
+|upkeep
+|turn|23
+|inactive|rudyrage1 has 120 seconds left.
+|
+|t:|1758829774
+|move|p1a: Dragonite|Extreme Speed|p2a: RageWagei
+|-damage|p2a: RageWagei|0 fnt
+|faint|p2a: RageWagei
+|-end|p2a: RageWagei|Protosynthesis|[silent]
+|
+|win|Kiyoshii_0
+|raw|Kiyoshii_0's rating: 1147 → <strong>1171</strong><br />(+24 for winning)
+|raw|rudyrage1's rating: 1131 → <strong>1107</strong><br />(-24 for losing)
+|l|‽Kiyoshii_0
+|player|p1|

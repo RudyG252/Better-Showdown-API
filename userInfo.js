@@ -1,13 +1,13 @@
 
 
 
-
+// get a user's match IDs given their name and the format you want the matches in
 export async function getUserInfo(user, format, pages) {
     let userRecentIds = await getMaxMatchIDs(user, format, pages)
     return userRecentIds;
 }
 
-
+// get match IDs until the user runs out of match IDs or pages runs out
 async function getMaxMatchIDs(user, format, pages) {
     let ids = [];
     let currentPage = await fetch ("https://replay.pokemonshowdown.com/search.json?user=" + user);
@@ -24,7 +24,7 @@ async function getMaxMatchIDs(user, format, pages) {
     return ids;
 }
 
-
+// get all match IDs from a page
 export function getIDSFromPage(page, format) {
     let ids = [];
     for (let i = 0; i < page.length; i++) {
@@ -35,6 +35,7 @@ export function getIDSFromPage(page, format) {
     return ids;
 }
 
+// Get all match ids from a match but end if the timestamp of the map passes cancelstamp
 export function getIDSFromPageRestricted(page, format, cancelStamp) {
     let ids = [];
     for (let i = 0; i < page.length; i++) {
@@ -51,6 +52,7 @@ export function getIDSFromPageRestricted(page, format, cancelStamp) {
     return ids;
 }
 
+// given a match id, get what format the match was played in
 function getFormatOutOfID(id) {
     for (let i = 0; i < id.length; i++) {
         if (id[i] == '-') {

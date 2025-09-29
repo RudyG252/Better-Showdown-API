@@ -1,9 +1,8 @@
 import express from 'express'
+import {getMoveArrs} from '../logFunctions.js'
 var router = express.Router();
 import {getUsage, getUsageMap, updateDB, getUsageFirebase} from '../usage.js'
 
-
-/* GET users listing. */
 router.get('/usageMap/:format', async function(req, res, next) {
     let usage = await getUsageMap(req.params.format)
     res.status(200).json({
@@ -12,6 +11,7 @@ router.get('/usageMap/:format', async function(req, res, next) {
         usageMap: usage,
     });
 })
+
 router.get('/usage/:month/:pokemon', async function(req, res, next) {
   let usage = await getUsageFirebase("Gen9OU", req.params.pokemon, req.params.month)
   res.status(200).json({
@@ -32,17 +32,19 @@ router.get('/usage/:format/:pokemon', async function(req, res, next) {
     });
 });
 
-
 router.get('/updateDB/:month/:format', async function(req, res) {
     "Send Request"
-    let test = await updateDB(req.params.month, req.params.format, 100)
+    let update = await updateDB(req.params.month, req.params.format, 100)
     res.status(200).json({
         success: true,
-        test
     });
   });
 
-
+router.get('/', async function(req, res) {
+    res.status(200).json({
+        success: true,
+    });
+  });
 
 
 export default router;

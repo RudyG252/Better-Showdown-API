@@ -1,5 +1,3 @@
 # Better-Showdown-API
-A modified pokemon showdown api that modifies the data from the original to make it more readable 
-
-Features Include:
-    - The ability
+A modified pokemon showdown API that modifies the data from the original to make it more readable and usable.
+The original pokemon showdown API's functionality is extremely limited, especially on the user end (smogon has amazing stats available for the pokemon usage end). This API's goal is to (especially on the user side), be able to put in a user's name and get all the data someone would possible want for that user, assuming they have their replays public, whether that user be yourself or someone else you're playing against. This API originally also wanted to be used by usage stats for different pokemon, but since smogon has literally everything you could possible want for that, so that part of the API might eventually be not used and switched so data gotten from smogon through a third party. The eventual goal for this project is to create a React frontend that will display things like a user's match history, used pokemon and sets on specific pokemon, and anything else you might want when you enter a username, along with pokemon usage stats like smogon.

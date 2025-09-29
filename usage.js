@@ -1,4 +1,5 @@
 import { getIDSFromPage, getIDSFromPageRestricted } from "./userInfo.js";
+import {getTeamsFromLog, getPlayerIndex} from "./logFunctions.js"
 import  {
     addDoc,
     collection,
@@ -19,15 +20,16 @@ let bothMonNameID = "2938238&38#93$29#3&23928392839832"
 var globalLastTimestamp = 0;
 var globalRecentTimestamp = 0;
 
+// returns the percentage of games a pokemon was used for in a format (will eventually be replaced by firebase fully)
 export async function getUsage(format, pokemon) {
-    formatIDs = await configureFormatIDsRestricted(format, '09_25', 100);
+    formatIDs = await configureFormatIDsRestricted(format, '09_25', 2);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
     let usage = checkUsage(pokemon, bothMonNameID);
     return usage;
 }   
 
-
+// returns the percentage of games a pokemon was used for in a format in a given month from firebase
 export async function getUsageFirebase(format, pokemon, month) {
     let total = 0;
     const allMons = await getDocs(collection(db, 'Months', month, 'PokeData', 'Formats', format));
@@ -46,6 +48,7 @@ export async function getUsageFirebase(format, pokemon, month) {
     return ((monUsage/total) * 100).toFixed(2);
 }
 
+// returns a usageMap of all pokemon used in a format (will eventually be replaced by the same thing but using firebase)
 export async function getUsageMap(format) {
     formatIDs = await configureFormatIDsRestricted(format, '09_25', 3);
     logArr = await Promise.all(formatIDs.map(id => fetchReplayData(id)));
@@ -54,7 +57,7 @@ export async function getUsageMap(format) {
     return usage;
 }
 
-
+// updates the firebase with pokemon usage for a given month and format, updates an amount based on pages
 export async function updateDB(month, format, pages) {
     console.log("Start Format IDs")
     formatIDs = await configureFormatIDsRestricted(format, month, pages);
@@ -80,8 +83,7 @@ export async function updateDB(month, format, pages) {
     return "";
 }
 
-
-
+// returns the amount a player has used a pokemon given a set of matches
 export async function getPlayerUsage(ids, pokemon, name) {
     logArr = await Promise.all(ids.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
@@ -89,6 +91,7 @@ export async function getPlayerUsage(ids, pokemon, name) {
     return usage
 }
 
+// returns a usageMap of a player's pokemon usage in a given set of matches
 export async function getPlayerUsageMap(ids, name) {
     logArr = await Promise.all(ids.map(id => fetchReplayData(id)));
     totalTeams = [...logArr.map(log => getTeamsFromLog(log))];
@@ -96,19 +99,8 @@ export async function getPlayerUsageMap(ids, name) {
     return usage;
 }
 
-
-export async function testFunction(pokemonName) {
-
-
-    let pokeRef = doc(db, "Months", "09_25", "PokeData", "Formats", "Gen9OU",  pokemonName);
-    let prevData = (await getDoc(pokeRef)).data();
-    await setDoc(pokeRef, {"Losses" : 100, "Uses" : 100, "Wins" : 100});
-    let returnVal = await getDoc(pokeRef)
-    return returnVal.data();
-}
-
-
-
+// returns an amonunt of pages of match ids starting at date startingStamp
+// and going for a given amount of pages in a given format
 async function configureFormatIDs(format, pages, startingStamp) {
     if (startingStamp == -1) {
         startingStamp = Date.now();
@@ -137,7 +129,8 @@ async function configureFormatIDs(format, pages, startingStamp) {
     
 }
 
-
+// does the same thing as configureFormatIDs but starts at the most recent timestamp possible
+// and skips over timestamps that have already stored data in firebase
 async function configureFormatIDsRestricted(format, month, maxPages) {
     
     // Month Format = 09_25
@@ -215,31 +208,14 @@ async function configureFormatIDsRestricted(format, month, maxPages) {
     return ids;
 }
 
-
+// returns the replayData of a given matchid
 async function fetchReplayData(id) {
     const response = await fetch("https://replay.pokemonshowdown.com/" + id + ".json");
     const data = await response.json();
     return data.log;
 }
 
-
-function getTeamsFromLog(log) 
-{
-    let teams = [[],[]];
-    let lines = log.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i]
-        if (!line.startsWith("|poke|")) {
-            continue;
-        }
-        if (teams[0].length === 6 && teams[1].length === 6) {
-            return teams;
-        }
-        teams[line[7] == 1 ? 0 : 1].push(line.substring(9, line.length - 1));
-    }
-    return teams;
-}
-
+// returns the usage of a pokemon by a given player
 function checkUsage(pokemon, name) {
     
     let monCount = 0;
@@ -262,6 +238,7 @@ function checkUsage(pokemon, name) {
     return  ((monCount/totalCount) * 100).toFixed(2);
 }
 
+// creates a usageMap for a given player's pokemon usage
 function createUsageMap(name) {
     let usageMap = new Map();
     let total = 0;
@@ -307,7 +284,8 @@ function createUsageMap(name) {
 }
 
 
-function getTotalTeamData(format) {
+// returns the total amount of pokemon usage for a current set of matches
+function getTotalTeamData() {
     let totalTeamData = new Map();
     for (let i = 0; i < totalTeams.length; i++) {
         for (let j = 0; j < 2; j++) {
@@ -329,25 +307,16 @@ function getTotalTeamData(format) {
     return (Object.fromEntries(totalTeamData));
 }
 
-function getPlayerIndex(log, name) {
-    let lines = log.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-        lines[i] = lines[i].toLowerCase();
-        if (lines[i].startsWith("|player|p1|" + name.toLowerCase())) {
-            return 0;
-        }
-        if (lines[i].startsWith("|player|p2|" + name.toLowerCase())) {
-            return 1;
-        }
-    }
-}
 
+
+// Returns true if the team string contains a given pokemon string
 function teamIncludesPokemon(team, pokemon) {
     return (team.includes(pokemon)
         || team.includes(pokemon + ", M")
         || team.includes(pokemon + ", F"))
 }
 
+// Takes a pokemon name (ex: "Slowking, M", and returns the base pokemon name (the name before the comma))
 function simplifyMonName(pokemon) {
     for (let i = 0; i < pokemon.length; i++) {
         if (pokemon[i] == ',') {
@@ -357,6 +326,7 @@ function simplifyMonName(pokemon) {
     return pokemon
 }
 
+// Takes a date in epoch timestamp form and returns the month of the timestamp (ex: 09_25)
 function getMonth(epochDate) {
     let dateObject = new Date(epochDate * 1000);
     let month = dateObject.getMonth() + 1;
